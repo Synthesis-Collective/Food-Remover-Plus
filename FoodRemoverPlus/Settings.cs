@@ -25,19 +25,19 @@ namespace FoodRemoverPlus
 
         [SettingName("Shop Reduction %"), Tooltip("Reduces food in shops")]
         public int chanceShop = 95;
-        
+
         [SettingName("House Reduction %"), Tooltip("Reduces food in houses")]
         public int chanceHab = 100;
-        
+
         [SettingName("Wealthy House Reduction %"), Tooltip("Reduces food in wealthy houses")]
         public int chanceWealthy = 90;
-        
+
         [SettingName("Camp Reduction %"), Tooltip("Reduces food in Bandit, Imperial and Stormcloak Camps")]
         public int chanceCamp = 90;
-        
+
         [SettingName("Dungeon Reduction %"), Tooltip("Reduces food in dungeons")]
         public int chanceDungeon = 100;
-        
+
         [SettingName("Base Reduction %"), Tooltip("Base reduction for all other locations")]
         public int chanceBase = 100;
 
@@ -55,9 +55,9 @@ namespace FoodRemoverPlus
             FormLinkPickerCustomization(typeof(FormLink<ILocation>), typeof(FormLink<ILocation>))]
         public List<FormLink<ILocation>> skipLocs = new List<FormLink<ILocation>>();
 
-        [SettingName("Ignore Plugins"), Tooltip("Ignore food located in cells from these plugins"), 
+        [SettingName("Ignore Plugins"), Tooltip("Ignore food located in cells from these plugins"),
             FormLinkPickerCustomization(typeof(ModKey), typeof(ModKey))]
-        public List<ModKey> skipPlugins = new List<ModKey>();
+        public List<ModKey> skipPlugins = new List<ModKey>({"Wyrmstooth.esp"}, );
 
         //[SettingName("Custom Reductions"), Tooltip("EditorID, Reduction")]
         //public Dictionary<FormLink<ILocation>, int> customChance = new Dictionary<FormLink<ILocation>, int>();

@@ -1,0 +1,21 @@
+{
+  "removeFFFood": true,
+  "removeFFDrink": true,
+  "removeEffects": true,
+  "removeOwned": false,
+  "chanceShop": 95,
+  "chanceHab": 100,
+  "chanceWealthy": 90,
+  "chanceCamp": 90,
+  "chanceDungeon": 100,
+  "chanceBase": 100,
+  "specialLocs": [],
+  "chanceSpecial": 80,
+  "changeOwnership": true,
+  "skipLocs": [],
+  "skipPlugins": [
+    "Wyrmstooth.esp",
+    "LegacyoftheDragonborn.esm",
+    "SkyrimUniqueTreasures.esp"
+  ]
+}

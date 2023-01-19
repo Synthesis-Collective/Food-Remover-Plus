@@ -11,4 +11,8 @@
     <PackageReference Include="Mutagen.Bethesda.Skyrim" Version="0.40" />
     <PackageReference Include="Mutagen.Bethesda.Synthesis" Version="0.25.3" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
 </Project>
