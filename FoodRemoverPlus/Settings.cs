@@ -57,7 +57,7 @@ namespace FoodRemoverPlus
 
         [SettingName("Ignore Plugins"), Tooltip("Ignore food located in cells from these plugins"),
             FormLinkPickerCustomization(typeof(ModKey), typeof(ModKey))]
-        public List<ModKey> skipPlugins = new List<ModKey>({"Wyrmstooth.esp"}, );
+        public List<ModKey> skipPlugins = new List<ModKey>();
 
         //[SettingName("Custom Reductions"), Tooltip("EditorID, Reduction")]
         //public Dictionary<FormLink<ILocation>, int> customChance = new Dictionary<FormLink<ILocation>, int>();
