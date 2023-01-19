@@ -1,6 +1,6 @@
 {
   "Nickname": "",
-  "Visibility": "Exclude",
+  "Visibility": "Visible",
   "OneLineDescription": "Removes Food Items from Skyrim",
   "LongDescription": "Skyrim Mutagen Patcher that iterates through all placed food objects in a cell and disables them based on defined criteria. ",
   "PreferredAutoVersioning": "Default",
