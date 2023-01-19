@@ -336,6 +336,9 @@ namespace FoodRemoverPlus
             ///
             if (settings.Value.removeEffects || settings.Value.removeFFFood || settings.Value.removeFFDrink)
             {
+                Console.WriteLine("Removing non-alchemical effects from Food items");
+                int itmsPatched = 0;
+
                 foreach (var ingestible in state.LoadOrder.PriorityOrder.WinningOverrides<IIngestibleGetter>())
                 {
                     string ingestibleEditorID = ingestible.EditorID ?? "";
@@ -345,6 +348,7 @@ namespace FoodRemoverPlus
                         // It's Food
                         // Create Override Record
                         Ingestible modifiedIngestible = state.PatchMod.Ingestibles.GetOrAddAsOverride(ingestible);
+                        itmsPatched++;
 
                         //ExtendedList<Effect> effects = modifiedIngestible.Effects;
                         var effects = modifiedIngestible.Effects.ToList();
@@ -353,35 +357,31 @@ namespace FoodRemoverPlus
                         modifiedIngestible.Effects.Clear();
 
                         foreach (var effect in effects)
-                        {
-                            
+                        {                            
                             string eeid = effect.BaseEffect?.TryResolve(state.LinkCache)?.EditorID ?? "NotFound";
-
-                            Console.WriteLine("EffectID: " + eeid);
-
                             if (eeid.StartsWith("Food"))
                             {
-                                continue;
-                                //if (!settings.Value.removeEffects) modifiedIngestible.Effects.Add(effect);
+                                //continue;
+                                if (!settings.Value.removeEffects) modifiedIngestible.Effects.Add(effect);
                             }
                             else if (eeid.StartsWith("_Frost_FoodBuff"))
                             {
-                                //if (!settings.Value.removeFFFood) modifiedIngestible.Effects.Add(effect);
-                                continue;
+                                if (!settings.Value.removeFFFood) modifiedIngestible.Effects.Add(effect);
+                                //continue;
                             }
                             else if (eeid.StartsWith("_Frost_DrinkEffect"))
                             {
-                                //if (!settings.Value.removeFFDrink) modifiedIngestible.Effects.Add(effect);
-                                continue;
+                                if (!settings.Value.removeFFDrink) modifiedIngestible.Effects.Add(effect);
+                                //continue;
                             }
                             else
                             {
                                 modifiedIngestible.Effects.Add(effect);
-                                Console.WriteLine("EffectID: " + eeid);
                             }
                         }
                     }
                 }
+                Console.WriteLine("Removed non-alchemical effects from " + itmsPatched + " Food items");
             }
             ///
         }
