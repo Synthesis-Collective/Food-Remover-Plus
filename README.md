@@ -2,7 +2,7 @@
 Improved version of FoodRemover, a Skyrim Mutagen Patcher that iterates through all placed food objects in a cell and randomly disables them based on location type. It now has UI based configuration as well as a number of new features including the ability to skip owned food, to set the ownership of all food (no more free food everywhere) and remove all alchemical food effects.  
 
 ## Settings
-- Settings can be configured via the Synthesis UI on the Setting tab.
+Settings can be configured via the Synthesis UI on the Setting tab.
 - Remove Frostfall Effects from Food (yes/no) - Removes the warming effect from foods
 - Remove Frostfall Effects from Drinks (yes/no) - Removes the warming effect from drinks
 - Remove Alchemy Effects from Food (yes/no) - Removes the restore Health/Stamina/Magicka effects from food. No more food that magically heal you, you will need alchemical potions for that. Food will now only help with hunger.
