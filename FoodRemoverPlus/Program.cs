@@ -131,32 +131,14 @@ namespace FoodRemoverPlus
                 if (placedObjectRec.EditorID == null)
                 {
                     string poid = placedObjectRec.Base?.TryResolve(state.LinkCache)?.EditorID ?? "NULL ID";
-                    //Console.WriteLine("Base: " + placedObjectRec.Base.ToString());
-                    //Console.WriteLine("EditorID: " + poid);
-
-                    //if (!poid.ContainsInsensitive("Food"))
-                    //{
-                    //    continue;
-                    //}
-                    //else
-                    //{
-                    //    Console.WriteLine("EditorID: " + poid);
-                    //}
-
+                    
                     // Try to find the base object record, skip if null or not found
                     if (!placedObject.Record.Base.TryResolve<IIngestibleGetter>(state.LinkCache, out var placedObjectBase))
-                    {
-                        //Console.WriteLine("EditorID: " + poid);
-                        //Console.WriteLine("Continue at 1");
                         continue;
-                    }
+
                     // Check if it's EDID contains "Food", skip if EDID null or does not contain "Food"
                     if (placedObjectBase.EditorID == null || !placedObjectBase.EditorID.ContainsInsensitive("Food"))
-                    {
-                        //Console.WriteLine("EditorID: " + poid);
-                        //Console.WriteLine("Continue at 2");
                         continue;
-                    }
 
                     // Try to find the parent cell, skip if null or not found
                     if (!placedObject.TryGetParent<ICellGetter>(out var parentCell)) continue;
@@ -165,17 +147,11 @@ namespace FoodRemoverPlus
                     if (settings.Value.skipPlugins != null && parentCell.FormKey.ModKey != null
                         && settings.Value.skipPlugins.Contains(parentCell.FormKey.ModKey)) continue;
 
-                    // Find the cell's location record, skip if null or not found
-
-                    //var placedObjectLoc = parentCell.Location.TryResolve(state.LinkCache);
-                    //placedObjectLoc = new FormKey.Factory("0130FF:Skyrim.esm");
-
+                    // Find the cell's location record, if null or not found, use Tamrial Location
                     if (!parentCell.Location.TryResolve(state.LinkCache, out var placedObjectLocation))
                     {
                         placedObjectLocation = new Location(FormKey.Factory("0130FF:Skyrim.esm"), SkyrimRelease.SkyrimSE);
                     }
-
-                    //if (!parentCell.Location.TryResolve(state.LinkCache, out var placedObjectLocation)) continue;
                     
                     // Find if location is in list of locations to skip
                     if (placedObjectLocation.EditorID == null || problemLocationsS.Contains(placedObjectLocation.EditorID)) continue;
@@ -187,12 +163,13 @@ namespace FoodRemoverPlus
                     // Ensure the cell location has keywords, skip if it doesn't
                     //if (placedObjectLocation.Keywords == null) continue;
 
-                    // If "Remove Owned Food" setting is False, AND food is owned then skip (Code and idea courtesy of Glanzer-modder)
-
+                    // If "Remove Owned Food" setting is False, AND food is owned then skip (Idea courtesy of Glanzer-modder)
                     if (placedObject.Record.Owner != null 
                         && placedObject.Record.Owner.ToString() != "Null" 
                         && !settings.Value.removeOwned) continue;
                     
+                    // If food is placed programatically then skip (Idea and code courtesy of Glanzer-modder)
+                    if (placedObject.Record.EnableParent != null) continue;
 
                     //Start disabling step
                     //Start at base chance
@@ -203,13 +180,6 @@ namespace FoodRemoverPlus
                         //Set the removal chance based on location type keyword
                         var locationKeywords = placedObjectLocation.Keywords;
 
-                        // Check if location is in users custom list of percentages
-                        //if (placedObjectLocation.EditorID != null && customPercent != null && customPercent.ContainsKey(placedObjectLocation.EditorID))
-                        //{
-                        //    removalChance = (int)settings.Value.customPercent[placedObjectLocation.EditorID]!;
-                        //    Console.WriteLine("CustomLoc: " + placedObjectLocation.EditorID + " using " + removalChance + "%");
-                        //}
-                        //else
                         // Check for special locations
                         if (settings.Value.specialLocs != null && placedObjectLocation.EditorID != null
                             && settings.Value.specialLocs.Contains(placedObjectLocation))
@@ -235,7 +205,8 @@ namespace FoodRemoverPlus
                             || locationKeywords.Contains(Skyrim.Keyword.LocTypeGiantCamp)
                             || locationKeywords.Contains(Skyrim.Keyword.LocTypeHagravenNest))
                         {
-                            removalChance = (placedObjectLocation.EditorID == "KatariahLocation" ? settings.Value.chanceWealthy : settings.Value.chanceHab);
+                            removalChance = (placedObjectLocation.EditorID == "KatariahLocation" 
+                                ? settings.Value.chanceWealthy : settings.Value.chanceHab);
                         }
                         // Check for LocTypeShop Locations
                         else if (locationKeywords.Contains(Skyrim.Keyword.LocTypeStore)
@@ -269,7 +240,8 @@ namespace FoodRemoverPlus
                             removalChance = settings.Value.chanceDungeon;
                         }
                         // Check for problematic locations
-                        else if (placedObjectLocation.EditorID != null && problemLocationsP.TryGetValue(placedObjectLocation.EditorID, out int plChance))
+                        else if (placedObjectLocation.EditorID != null 
+                            && problemLocationsP.TryGetValue(placedObjectLocation.EditorID, out int plChance))
                         {
                             removalChance = plChance;
                         }
@@ -309,22 +281,17 @@ namespace FoodRemoverPlus
                         if (!myDebug)
                         {
                             IPlacedObject modifiedObject = placedObject.GetOrAddAsOverride(state.PatchMod);
-                            //Console.WriteLine("modifiedObject: " + modifiedObject.ToString());
                             if (parentCell.Owner != null && parentCell.Owner.ToString() != "Null")
                             {
+                                // If Cell Owner is Valid (!null)
                                 modifiedObject.Owner.SetTo(parentCell.Owner);
-                                //Console.WriteLine("Changed Ownership to: " + parentCell.Owner.ToString());
                             }
                             else
                             {
+                                // If Cell Owner is null, set ownership to dummy faction
                                 var powner = new Faction(FormKey.Factory("10E4FE:Skyrim.esm"), SkyrimRelease.SkyrimSE);
                                 modifiedObject.Owner.SetTo(powner);
-                                //Console.WriteLine("Changed Ownership to: Dummy Faction");
                             }
-                            
-                            //Console.WriteLine("Changed Ownership to: " + parentCell.Owner.ToString());
-                            //Console.WriteLine("modifiedObject: " + modifiedObject.ToString());
-                            //modifiedObject.Owner = (FormLinkNullable<IOwnerGetter>)parentCell.Owner;
                         }
                     }
                 }
@@ -333,57 +300,57 @@ namespace FoodRemoverPlus
 
 
             // Remove Food Effects
-            ///
-            if (settings.Value.removeEffects || settings.Value.removeFFFood || settings.Value.removeFFDrink)
-            {
-                Console.WriteLine("Removing non-alchemical effects from Food items");
-                int itmsPatched = 0;
+            // Was asked to add this in, but don't remember by who or why. Can not get to work anyway
+            // have decided it's no longer worth the effort. Will revist later if a need arises again.
 
-                foreach (var ingestible in state.LoadOrder.PriorityOrder.WinningOverrides<IIngestibleGetter>())
-                {
-                    string ingestibleEditorID = ingestible.EditorID ?? "";
+            // if (settings.Value.removeEffects || settings.Value.removeFFFood || settings.Value.removeFFDrink)
+            // {
+            //     Console.WriteLine("Removing non-alchemical effects from Food items");
+            //     int itmsPatched = 0;
 
-                    if (ingestibleEditorID.ContainsInsensitive("Food"))
-                    {
-                        // It's Food
-                        // Create Override Record
-                        Ingestible modifiedIngestible = state.PatchMod.Ingestibles.GetOrAddAsOverride(ingestible);
-                        itmsPatched++;
+            //     foreach (var ingestible in state.LoadOrder.PriorityOrder.WinningOverrides<IIngestibleGetter>())
+            //     {
+            //         string ingestibleEditorID = ingestible.EditorID ?? "";
 
-                        //ExtendedList<Effect> effects = modifiedIngestible.Effects;
-                        var effects = modifiedIngestible.Effects.ToList();
+            //         if (ingestibleEditorID.ContainsInsensitive("Food"))
+            //         {
+            //             // It's Food
+            //             // Create Override Record
+            //             Ingestible modifiedIngestible = state.PatchMod.Ingestibles.GetOrAddAsOverride(ingestible);
+            //             itmsPatched++;
 
-                        // Clear all Effects
-                        modifiedIngestible.Effects.Clear();
+            //             // Make a copy of all Effects the item currently has
+            //             var effects = modifiedIngestible.Effects.ToList();
 
-                        foreach (var effect in effects)
-                        {                            
-                            string eeid = effect.BaseEffect?.TryResolve(state.LinkCache)?.EditorID ?? "NotFound";
-                            if (eeid.StartsWith("Food"))
-                            {
-                                //continue;
-                                if (!settings.Value.removeEffects) modifiedIngestible.Effects.Add(effect);
-                            }
-                            else if (eeid.StartsWith("_Frost_FoodBuff"))
-                            {
-                                if (!settings.Value.removeFFFood) modifiedIngestible.Effects.Add(effect);
-                                //continue;
-                            }
-                            else if (eeid.StartsWith("_Frost_DrinkEffect"))
-                            {
-                                if (!settings.Value.removeFFDrink) modifiedIngestible.Effects.Add(effect);
-                                //continue;
-                            }
-                            else
-                            {
-                                modifiedIngestible.Effects.Add(effect);
-                            }
-                        }
-                    }
-                }
-                Console.WriteLine("Removed non-alchemical effects from " + itmsPatched + " Food items");
-            }
-            ///
+            //             // Clear all Effects
+            //             modifiedIngestible.Effects.Clear();
+
+            //             // For each Effect in the copy, add it back if appropriate.
+                        
+            //             foreach (var effect in effects)
+            //             {                            
+            //                 string eeid = effect.BaseEffect?.TryResolve(state.LinkCache)?.EditorID ?? "NotFound";
+            //                 if (eeid.ContainsInsensitive("Food"))
+            //                 {
+            //                     if (!settings.Value.removeEffects) modifiedIngestible.Effects.Add(effect);
+            //                 }
+            //                 else if (eeid.StartsWith("_Frost_FoodBuff"))
+            //                 {
+            //                     if (!settings.Value.removeFFFood) modifiedIngestible.Effects.Add(effect);
+            //                 }
+            //                 else if (eeid.StartsWith("_Frost_DrinkEffect"))
+            //                 {
+            //                     if (!settings.Value.removeFFDrink) modifiedIngestible.Effects.Add(effect);
+            //                 }
+            //                 else if (effect != null)
+            //                 {
+            //                     modifiedIngestible.Effects.Add(effect);
+            //                 }
+            //             }
+            //         }
+            //     }
+            //     Console.WriteLine("Removed alchemical effects from " + itmsPatched + " Food items");
+            // }
         }
     }
 }
