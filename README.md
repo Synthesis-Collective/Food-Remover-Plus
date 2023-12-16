@@ -1,6 +1,3 @@
-# **Still in development. Use at own risk.**
-Finally Ready for Play Testing
-
 # FoodRemoverPlus
 Improved version of FoodRemover, a Mutagen Patcher that iterates through all placed food objects in a cell and randomly disables them based on location type. It now has UI based configuration as well as a number of new features including the ability to skip owned food and to set ownership on all food (no more free food everywhere).  
 
